@@ -4,4 +4,4 @@ Very simple command
 
 /redeem [code]
 
-https://streamable.com/bnr3b9
+https://streamable.com/s6zgxh
