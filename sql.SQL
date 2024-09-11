@@ -1,0 +1,10 @@
+CREATE TABLE redeem_codes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(255) UNIQUE NOT NULL,
+    item VARCHAR(255) NOT NULL,
+    amount INT NOT NULL,
+    uses INT NOT NULL,
+    redeemed_by JSON DEFAULT '[]',
+    created_by VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
