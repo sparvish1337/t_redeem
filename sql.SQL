@@ -1,10 +1,18 @@
-CREATE TABLE redeem_codes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    code VARCHAR(255) UNIQUE NOT NULL,
-    item VARCHAR(255) NOT NULL,
-    amount INT NOT NULL,
-    uses INT NOT NULL,
-    redeemed_by JSON DEFAULT '[]',
-    created_by VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE `redeem_codes` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`code` VARCHAR(255) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`item` VARCHAR(255) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`amount` INT(11) NOT NULL,
+	`uses` INT(11) NOT NULL,
+	`redeemed_by` LONGTEXT NULL DEFAULT '{}' COLLATE 'utf8mb4_bin',
+	`created_by` VARCHAR(255) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`created_at` TIMESTAMP NULL DEFAULT current_timestamp(),
+	`expiry` DATETIME NULL DEFAULT NULL,
+	PRIMARY KEY (`id`) USING BTREE,
+	UNIQUE INDEX `code` (`code`) USING BTREE,
+	CONSTRAINT `redeemed_by` CHECK (json_valid(`redeemed_by`))
+)
+COLLATE='utf8mb3_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=4
+;
