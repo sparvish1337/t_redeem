@@ -1,9 +1,16 @@
 RegisterNetEvent('redeem:giveItem')
 AddEventHandler('redeem:giveItem', function(item, amount)
-    if qbx.PlayerData then
-        TriggerServerEvent('ox_inventory:AddItem', item, amount) 
-        TriggerEvent('chat:addMessage', { args = { '^2SYSTEM', 'You received ' .. amount .. 'x ' .. item } })
-    else
-        TriggerEvent('chat:addMessage', { args = { '^1SYSTEM', 'Player data not loaded!' } })
-    end
+        TriggerServerEvent('ox_inventory:AddItem', item, amount)
+end)
+
+function NotificationUser(title, description, type)
+    lib.notify({
+        title = title,
+        description = description,
+        type = type
+    })
+end
+RegisterNetEvent("t-redeem:notifyUser")
+AddEventHandler("t-redeem:notifyUser", function(title, description, type)
+    NotificationUser(title, description, type)
 end)
