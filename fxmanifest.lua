@@ -1,7 +1,12 @@
 fx_version 'cerulean'
 game 'gta5'
+lua54 "yes"
 
 description 'Redeem System for QBox'
+
+shared_scripts {
+    '@ox_lib/init.lua',
+}
 
 server_scripts {
     'server.lua'
