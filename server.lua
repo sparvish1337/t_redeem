@@ -43,7 +43,7 @@ RegisterCommand('generate', function(source, args, rawCommand)
         ['@expiry'] = expiryDate
     }, function()
         TriggerClientEvent("t-redeem:notifyUser", source, "Generated", "generated a redeem code", "info")
-        sendToDiscord("Code Generated", playerName .. " generated a redeem code: " .. customCode .. "` with " .. uses .. " uses and expiry in " .. expiryDays .. " days.", 3066993)
+        sendToDiscord("Code Generated", playerName .. " generated a redeem code: `" .. customCode .. "` with " .. uses .. " uses and expiry in " .. expiryDays .. " days.", 3066993)
     end)
 end, false)
 
@@ -90,7 +90,7 @@ RegisterCommand('redeem', function(source, args, rawCommand)
             local discordId = identifiers[2] and identifiers[2]:match("%d+") or 'N/A'
             local steamId = identifiers[3] or 'N/A'
 
-            sendToDiscord("Code Redeemed", playerName .. " redeemed the code: " .. code .. "\n\n**Identifiers:**\nCFX License: " .. cfxId .. "\nDiscord ID: " .. discordId .. "\nSteam ID: " .. steamId, 15844367)
+            sendToDiscord("Code Redeemed", playerName .. " redeemed the code: `" .. code .. "` and received reward.\n\n**Identifiers:**\nCFX License: " .. cfxId .. "\nDiscord ID: " .. discordId .. "\nSteam ID: " .. steamId, 15844367)
         else
             TriggerClientEvent("t-redeem:notifyUser", source, "Whoops!", "Invalid or expired code!", "error")
         end
