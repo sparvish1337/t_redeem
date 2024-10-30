@@ -24,22 +24,16 @@ RegisterCommand('generate', function(source, args, rawCommand)
     local playerName = GetPlayerName(source)
 
     if not IsPlayerAdmin(xPlayer) then
-        TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'You do not have permission to use this command!' } })
+            TriggerClientEvent("t-redeem:notifyUser", source, "Whoops!", "You do not have permission to use this command!", "error")
         return
     end
 
-    -- Expecting items as JSON string (e.g., '[{"item": "bread", "amount": 5}, {"item": "water", "amount": 3}]')
     local items = args[1]
     local uses = tonumber(args[2])
     local expiryDays = tonumber(args[3])
     local customCode = args[4] or tostring(math.random(100000, 999999))
 
-    if not items or not uses or not expiryDays then
-        TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Usage: /generate [items_json] [uses] [expiry_days] [code]' } })
-        return
-    end
-
-    local expiryDate = os.date("%Y-%m-%d %H:%M:%S", os.time() + (expiryDays * 86400)) -- Convert days to seconds
+    local expiryDate = os.date("%Y-%m-%d %H:%M:%S", os.time() + (expiryDays * 86400))
 
     executeSQL('INSERT INTO redeem_codes (code, items, uses, created_by, expiry) VALUES (@code, @items, @uses, @created_by, @expiry)', {
         ['@code'] = customCode,
@@ -48,8 +42,8 @@ RegisterCommand('generate', function(source, args, rawCommand)
         ['@created_by'] = playerName,
         ['@expiry'] = expiryDate
     }, function()
-        TriggerClientEvent('chat:addMessage', source, { args = { '^2SYSTEM', 'Redeem code generated: ' .. customCode .. ' with ' .. uses .. ' uses and expiry in ' .. expiryDays .. ' days.' } })
-        sendToDiscord("Code Generated", playerName .. " generated a redeem code: `" .. customCode .. "` with " .. uses .. " uses and expiry in " .. expiryDays .. " days.", 3066993) -- Blue color
+        TriggerClientEvent("t-redeem:notifyUser", source, "Generated", "generated a redeem code", "info")
+        sendToDiscord("Code Generated", playerName .. " generated a redeem code: `" .. customCode .. "` with " .. uses .. " uses and expiry in " .. expiryDays .. " days.", 3066993)
     end)
 end, false)
 
@@ -58,11 +52,6 @@ RegisterCommand('redeem', function(source, args, rawCommand)
     local playerName = GetPlayerName(source)
     local identifiers = GetPlayerIdentifiers(source)
     local playerId = identifiers[1]
-
-    if not code then
-        TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Usage: /redeem [code]' } })
-        return
-    end
 
     executeSQL('SELECT * FROM redeem_codes WHERE code = @code AND (expiry IS NULL OR expiry > NOW())', {
         ['@code'] = code
@@ -74,12 +63,12 @@ RegisterCommand('redeem', function(source, args, rawCommand)
             local redeemedBy = json.decode(redeemData.redeemed_by) or {}
 
             if redeemedBy[playerId] then
-                TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'You have already redeemed this code!' } })
+                TriggerClientEvent("t-redeem:notifyUser", source, "Sorry!", "You have already redeemed this code!", "error")
                 return
             end
 
             if remainingUses <= 0 then
-                TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'This code has already been used the maximum number of times!' } })
+                TriggerClientEvent("t-redeem:notifyUser", source, "Sorry!", "This code has already been used the maximum number of times!", "error")
                 return
             end
 
@@ -87,7 +76,7 @@ RegisterCommand('redeem', function(source, args, rawCommand)
                 local item = itemData.item
                 local amount = itemData.amount
                 exports.ox_inventory:AddItem(source, item, amount)
-                exports.qbx_core:Notify(source, { text = 'Successfully redeemed ' .. amount .. 'x ' .. item, notifyType = 'success', duration = 5000 })
+                TriggerClientEvent("t-redeem:notifyUser", source, "Redeemed", "Code Redeemed", "success")
             end
 
             redeemedBy[playerId] = true
@@ -101,9 +90,9 @@ RegisterCommand('redeem', function(source, args, rawCommand)
             local discordId = identifiers[2] and identifiers[2]:match("%d+") or 'N/A'
             local steamId = identifiers[3] or 'N/A'
 
-            sendToDiscord("Code Redeemed", playerName .. " redeemed the code: `" .. code .. "` and received multiple items.\n\n**Identifiers:**\nCFX Username: " .. cfxId .. "\nDiscord ID: " .. discordId .. "\nSteam ID: " .. steamId, 15844367) -- Green color
+            sendToDiscord("Code Redeemed", playerName .. " redeemed the code: `" .. code .. "` and received reward.\n\n**Identifiers:**\nCFX License: " .. cfxId .. "\nDiscord ID: " .. discordId .. "\nSteam ID: " .. steamId, 15844367)
         else
-            TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Invalid or expired code!' } })
+            TriggerClientEvent("t-redeem:notifyUser", source, "Whoops!", "Invalid or expired code!", "error")
         end
     end)
 end, false)
